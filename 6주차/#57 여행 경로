@@ -1,0 +1,48 @@
+import java.util.*;
+
+class Solution {
+    public String[] solution(String[][] tickets) {
+        
+        List<String> route = new ArrayList<>();
+        boolean[] visited = new boolean[tickets.length];
+
+        // 티켓들을 출발지, 도착지 기준으로 사전순 정렬
+        Arrays.sort(tickets, (a, b) -> {
+            if (a[0].equals(b[0])) {
+                return a[1].compareTo(b[1]);
+            }
+            return a[0].compareTo(b[0]);
+        });
+
+        // DFS 탐색 시작
+        dfs("ICN", tickets, visited, route, 0);
+
+        return route.toArray(new String[0]);
+    }
+
+    private boolean dfs(String current, String[][] tickets, boolean[] visited, List<String> route, int usedCount) {
+        route.add(current);
+
+        if (usedCount == tickets.length) {
+            // 모든 티켓을 사용한 경우: 경로 완성!
+            return true;
+        }
+
+        for (int i = 0; i < tickets.length; i++) {
+            if (!visited[i] && tickets[i][0].equals(current)) {
+                visited[i] = true;
+
+                if (dfs(tickets[i][1], tickets, visited, route, usedCount + 1)) {
+                    return true;  // 성공적으로 경로 완성된 경우 break
+                }
+
+                // 백트래킹
+                visited[i] = false;
+            }
+        }
+
+        // 현재 경로가 막힌 경우: 마지막 경로 제거하고 false 반환
+        route.remove(route.size() - 1);
+        return false;
+    }
+}

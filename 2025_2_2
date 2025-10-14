@@ -1,0 +1,26 @@
+class Solution {
+    public int solution(int[] players, int m, int k) {
+        
+        // players[i]: i시(i시간)에 접속 시도하는 유저 수
+        // m: 서버 1대당 동시에 수용 가능한 유저 수
+        // k: 서버 1대가 운영 가능한 시간 
+        
+        int answer = 0;
+        int active = 0;
+        int[] install = new int[24]; 
+
+        for (int i = 0; i < 24; i++) {
+            if (i >= k) {
+                active -= install[i - k];
+            }
+            int required = players[i] / m;
+            if (active < required) {
+                int add = required - active;
+                answer += add;
+                active += add;
+                install[i] = add;
+            }
+        }
+        return answer;
+    }
+}

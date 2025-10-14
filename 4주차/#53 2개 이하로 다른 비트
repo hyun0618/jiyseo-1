@@ -1,0 +1,26 @@
+class Solution {
+    public long[] solution(long[] numbers) {
+        long[] answer = new long[numbers.length];
+        
+        for (int i = 0; i < numbers.length; i++) {
+            long x = numbers[i];
+
+            if (x % 2 == 0) {
+                // 짝수면 무조건 x + 1
+                answer[i] = x + 1;
+            } else {
+                // 홀수인 경우
+                // ex) x = 7 (0111) → result = 11 (1011)
+                long temp = x;
+                long bit = 1L;
+                // 처음으로 0인 자리 찾기
+                while ((temp & bit) != 0) {
+                    bit <<= 1;
+                }
+                // 해당 자리는 1로, 바로 앞 비트는 0으로
+                answer[i] = x + bit - (bit >> 1);
+            }
+        }
+        return answer;
+    }
+}

@@ -1,0 +1,51 @@
+class Solution {
+    public int solution(int n, int[][] results) {
+
+        /* 4>2>5, 3>2>5, 1>2>5, 
+        {{4,3}, {4,2}, {3,2}, {1,2}, {2,5}}        
+        
+        n |  1 |  2 |  3 |  4 |  5
+        ----------------------------
+        1 |    |  1 |    |    |  1  
+        2 | -1 |    | -1 | -1 |  1   => 2번 선수
+        3 |    |  1 |    | -1 |
+        4 |    |  1 |  1 |    |
+        5 | -1 | -1 | -1 | -1 |      => 5번 선수    
+        
+        
+        */
+
+        int[][] graph = new int[n+1][n+1];
+        
+        for (int[] result : results) {
+            int winner = result[0];
+            int loser = result[1];
+            graph[winner][loser] = 1;
+            graph[loser][winner] = -1;
+        }
+        
+        for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    if (graph[i][k] == 1 && graph[k][j] == 1) {
+                        graph[i][j] = 1;
+                        graph[j][i] = -1;
+                    }
+                }
+            }
+        }
+        
+        int answer = 0;
+        
+        for (int i = 1; i <= n; i++) {
+            int known = 0;
+            for (int j = 1; j <= n; j++) {
+                if (i == j) continue;
+                if (graph[i][j] != 0) known++;
+            }
+            if (known == n - 1) answer++;
+        }
+    
+        return answer;
+    }
+}

@@ -1,0 +1,33 @@
+import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public String solution(String[] participant, String[] completion) {
+
+        // 해시맵 선언 
+        Map<String, Integer> participantMap = new HashMap<>(); 
+
+        // 참가자 목록을 해시맵에 저장 
+        // participant 배열을 순회하면서, 각 참가자의 이름을 HashMap에 저장
+        // 이미 있는 이름이면 기존 값에 +1, 처음 등장하는 이름이면 기본값 0에서 +1
+        for (String p : participant) {
+            participantMap.put(p, participantMap.getOrDefault(p, 0) + 1);
+        }
+
+        // 완주한 선수 목록을 반영 
+        // 완주한 선수의 이름을 해시맵에서 찾아 해당 카운트를 -1
+        for (String c : completion) {
+            participantMap.put(c, participantMap.get(c) - 1);
+        }
+
+        // 완주하지 못한 선수 찾기 
+        // 해시맵을 순회하면서, 값이 0이 아닌 이름을 찾아 반환
+        for (Map.Entry<String, Integer> entry : participantMap.entrySet()) {
+            if (entry.getValue() != 0) {
+                return entry.getKey();
+            }
+        }
+        // 예외 처리
+        return "";
+    }
+}

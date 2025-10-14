@@ -1,0 +1,88 @@
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+
+
+class Solution {
+    
+    // 길이별로 나눈 단어 리스트 (정방향)
+    Map<Integer, List<String>> forward = new HashMap<>();
+    
+    // 길이별로 나눈 단어 리스트 (역방향 → 접두사가 ?일 때 사용)
+    Map<Integer, List<String>> reversed = new HashMap<>();
+    
+    public int[] solution(String[] words, String[] queries) {
+        // 단어 저장
+        for (String word : words) {
+            int len = word.length();
+            
+            forward.putIfAbsent(len, new ArrayList<>());
+            forward.get(len).add(word);
+            
+            String rev = new StringBuilder(word).reverse().toString();
+            reversed.putIfAbsent(len, new ArrayList<>());
+            reversed.get(len).add(rev);
+        }
+        
+        // 정렬 (이진 탐색용)
+        for (List<String> list : forward.values()) Collections.sort(list);
+        for (List<String> list : reversed.values()) Collections.sort(list);
+        
+        int[] answer = new int[queries.length];
+        
+        for (int i = 0; i < queries.length; i++) {
+            String query = queries[i];
+            int len = query.length();
+            
+            // 쿼리 안에 알파벳이 아예 없으면 전체 단어 개수 반환
+            if (query.replace("?", "").isEmpty()) {
+                answer[i] = forward.containsKey(len) ? forward.get(len).size() : 0;
+                continue;
+            }
+            
+            boolean isPrefixWildcard = query.charAt(0) == '?';
+            List<String> targetList = isPrefixWildcard
+                ? reversed.getOrDefault(len, new ArrayList<>())
+                : forward.getOrDefault(len, new ArrayList<>());
+            
+            String key = isPrefixWildcard
+                ? new StringBuilder(query).reverse().toString()
+                : query;
+            
+            // 범위 생성: 고정된 부분 기준
+            String lower = key.replace('?', 'a');
+            String upper = key.replace('?', 'z');
+            
+            answer[i] = countByRange(targetList, lower, upper);
+        }
+        
+        return answer;
+    }
+    
+    // 이진 탐색 범위 계산
+    private int countByRange(List<String> list, String left, String right) {
+        return upperBound(list, right) - lowerBound(list, left);
+    }
+
+    private int lowerBound(List<String> list, String target) {
+        int left = 0, right = list.size();
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (list.get(mid).compareTo(target) >= 0) right = mid;
+            else left = mid + 1;
+        }
+        return left;
+    }
+
+    private int upperBound(List<String> list, String target) {
+        int left = 0, right = list.size();
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (list.get(mid).compareTo(target) > 0) right = mid;
+            else left = mid + 1;
+        }
+        return left;
+    }
+}
